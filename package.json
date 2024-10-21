@@ -1,0 +1,56 @@
+{
+  "name": "wampum-popups",
+  "version": "2.2.0",
+  "description": "Wampum Popups",
+  "main": "wampum-popups.php",
+  "scripts": {
+    "bs": "browser-sync start --config bs-config.js",
+    "watch": "sass --watch assets/scss/custom.scss:assets/css --source-map true --style=compressed",
+    "build:css": "postcss --use autoprefixer postcss-nesting postcss-minify postcss-discard-empty --no-map css/wampum-popups.css -o css/wampum-popups.min.css",
+    "build-dev:css": "postcss --use autoprefixer postcss-nesting postcss-discard-empty --no-map css/wampum-popups.css -o css/wampum-popups.min.css",
+    "build:js":"npx terser js/wampum-popups.js -o js/wampum-popups.min.js --compress --mangle",
+    "build-dev:js": "npx terser js/wampum-popups.js -o js/wampum-popups.min.js",
+    "build:fn-js": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jengo-agency/wampum-popups.git"
+  },
+  "author": "BizBudding, INC, Arnaud Lapiere.",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/jengo-agency/wampum-popups/issues"
+  },
+  "homepage": "https://github.com/jengo-agency/wampum-popups#readme",
+  "browserslist": [
+    ">0.5%",
+    "last 2 versions",
+    ">0.2% in FR",
+    "Firefox ESR",
+    "not dead"
+  ],
+  "dependencies": {
+    "foundation-sites": "^6.7",
+    "postcss-discard-empty": "^7.0.0",
+    "postcss-media-minmax": "^5.0.0",
+    "postcss-minify": "^1.1.0",
+    "saas": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.10",
+    "@babel/preset-env": "^7.17.10",
+    "@eslint/js": "^9.13.0",
+    "autoprefixer": "^10.4.14",
+    "babel-loader": "^8.2.5",
+    "browser-sync": "^3.0.2",
+    "eslint": "^9.13.0",
+    "globals": "^15.11.0",
+    "postcss": "^8.4.31",
+    "postcss-cli": "^10.1.0",
+    "postcss-nesting": "^12.0.1",
+    "sass": "^1.49",
+    "terser": "^5.36.0",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2"
+  }
+}

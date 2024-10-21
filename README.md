@@ -1,18 +1,18 @@
 # Wampum Popups
-A lightweight but flexible WordPress popups plugin utilizing [oiubounce](https://github.com/carlsednaoui/ouibounce).
+A lightweight but flexible WordPress popups plugin utilizing [oiubounce](https://github.com/toptal/ouibounce/).
 * Use a simple shortcode (or PHP function) to create 1 or more popups (or slideups) throughout your website
 * Popup types include exit itent, timed, link, and button
 * Automatically works with WordPress galleries (when set to link to file or attachment page)
 * Default exit intent and timed popups store an expiring cookie in the browser so it won't continue to display after a user closes it
 * Various options allow fine-tuning (see below)
-* Easy plugin updates in the WordPress Dashboard via [GitHub Updater plugin](https://github.com/afragen/github-updater)
+* Easy plugin updates in the WordPress Dashboard via [plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker)
 
 ![Wampum Popups modal example](assets/wampum-popups-modal.jpg)
 
 ![Wampum Popups slideup example](assets/wampum-popups-slideup.jpg)
 
 ## Basic Usage
-Tip: A browser extention like [Cookie Inspector](https://chrome.google.com/webstore/detail/cookie-inspector/jgbbilmfbammlbbhmmgaagdkbkepnijn) is helpful as it lets you manually clear individual cookies 1 at a time
+Tip: Chrome Developer tools are helpful as it lets you manually clear individual cookies 1 at a time
 
 ### Shortcode
 
@@ -191,9 +191,9 @@ Force the popup to show, always. Don't be annoying.
 
 ### Other available options/parameters
 
-Read about these options on the [ouibounce wiki](https://github.com/carlsednaoui/ouibounce/blob/master/README.md)
+Read about these options on the [ouibounce wiki](https://github.com/toptal/ouibounce/blob/master/README.md)
 
-* 'callback' (This has been removed/reserved for future use)
+* 'callback' (reserved for future use)
 * 'cookieExpire'
 * 'cookieDomain'
 * 'cookieName'
