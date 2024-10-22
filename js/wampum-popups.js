@@ -10,7 +10,10 @@ document.ready = function (readyFn) {
 };
 
 function show(obj) {
-  if (!obj) return false;
+  if (!obj) {
+    console.warn("show : obj is null");
+    return false;
+  }
   if (getComputedStyle(obj).display !== "none") return false;
   if (obj.dataset.displayWas) {
     obj.style.display = obj.dataset.displayWas;
@@ -24,34 +27,48 @@ function show(obj) {
   }
   return true;
 }
-
 function hide(obj) {
-  if (!obj) return false;
-  let computedDisplay = getComputedStyle(obj).display;
-  if (computedDisplay === "none") return false;
-  if (obj.style.display && obj.style.display !== "revert") obj.dataset.displayWas = obj.style.display;
+  if (!obj) {
+    //console.warn("hide : obj is null");
+    return false;
+  }
+  if (getComputedStyle(obj).display == "none") return false;
+  if (obj.style.display && obj.style.display != "revert") obj.dataset.displayWas = obj.style.display;
   obj.style.display = "none";
   return true;
 }
 
+// Fade functions with consistent transition cleanup
+function fadeIn(element, duration = 300) {
+  if (!element) {
+    console.warn("fadeIn : obj is null");
+    return false;
+  }
+  element.classList.add("fade-in");
+  show(element);
+  const handleAnimationEnd = () => {
+    element.classList.remove("fade-in");
+    element.removeEventListener("animationend", handleAnimationEnd);
+  };
+  element.addEventListener("animationend", handleAnimationEnd);
+  return true;
+}
 function fadeOut(element, duration = 300) {
-  element.style.opacity = 1;
-  element.style.transition = `opacity ${duration}ms ease-in-out`;
-
-  requestAnimationFrame(() => {
-    element.style.opacity = 0;
-  });
-
-  element.addEventListener("transitionend", function handleTransitionEnd() {
+  if (!element) {
+    console.warn("fadeIn : obj is null");
+    return false;
+  }
+  element.classList.add("fade-out");
+  const handleAnimationEnd = () => {
     element.style.display = "none";
-    element.style.transition = "";
-    element.removeEventListener("transitionend", handleTransitionEnd);
-  }, { once: true });
+    element.classList.remove("fade-out");
+    element.removeEventListener("animationend", handleAnimationEnd);
+  };
+  element.addEventListener("animationend", handleAnimationEnd);
+  return true;
 }
 
-/*!
- * Wampum Popups
- */
+ // Wampum Popups
 document.ready(() => {
   "use strict";
 
@@ -60,12 +77,14 @@ document.ready(() => {
     return;
   }
 
-  document.body.addEventListener("click", (e) => {
-    if (e.target.matches(".wampum-popup-link")) {
+  document.querySelectorAll(".wampum-popup-link").forEach((link) => {
+    link.addEventListener("click", (e) => {
       e.preventDefault();
-      const popupId = e.target.getAttribute("data-popup");
-      show(document.querySelector(`#wampum-popup-${popupId}`));
-    }
+      const popupId = link.getAttribute("data-popup");
+      const popup = document.querySelector(`#wampum-popup-${popupId}`);
+      console.log("[popup] clicking on link, displaying popup " + popupId);
+      show(popup);
+    });
   });
 
   document.querySelectorAll(".wampum-popup").forEach((popup) => {
@@ -78,7 +97,9 @@ document.ready(() => {
       return;
     }
     //setup potential ouibounce options, Default to an empty object
-    const oui = { ...(ouiVars || {}) };
+    const oui = {
+      ...(ouiVars || {}),
+    };
     // Add class to the popup wrap
     popup.classList.add(`wampum-${popupVars.style}`, `wampum-${popupVars.type}`);
 
@@ -197,21 +218,14 @@ document.ready(() => {
     }
 
     popup.addEventListener("click", (e) => {
-      if (e.target.matches(".wampum-popup-close")) {
+      if ( ( e.target.matches( ".wampum-popup-close" ) || e.target.matches( ".wampum-popup-overlay.close-outside" ) ) && !e.target.matches( ".wampum-popup-prev, .wampum-popup-next" ) && !e.target.closest( ".wampum-popup-content" ) ) {
+        console.log("[popup] clicking on 'overlay or cross', closing popup ");
         closePopup(popup);
+        if (popupVars.close_outside) {
+          //const overlay = document.querySelector(".wampum-popup-overlay", popup);
+        }
       }
     });
-
-    if (popupVars.close_outside) {
-      document.body.addEventListener("mouseup", (e) => {
-        if (e.target.matches(".wampum-popup-prev, .wampum-popup-next")) {
-          return false;
-        }
-        if (!e.target.closest(".wampum-popup-content")) {
-          closePopup(popup);
-        }
-      });
-    }
   });
 
   document.addEventListener("keydown", (e) => {
@@ -224,15 +238,15 @@ document.ready(() => {
     }
   });
 
-function resizeContent(element) {
-  const parent = element.closest(".wampum-popup-inner");
-  if (!parent) return; // Fallback or early exit if no parent is found
-  element.style.width = "auto";
-  element.style.height = "auto";
-  element.style.height = `${parent.offsetHeight}px`;
-  element.style.maxHeight = "100%";
-  element.style.maxWidth = "100%";
-}
+  function resizeContent(element) {
+    const parent = element.closest(".wampum-popup-inner");
+    if (!parent) return; // Fallback or early exit if no parent is found
+    element.style.width = "auto";
+    element.style.height = "auto";
+    element.style.height = `${parent.offsetHeight}px`;
+    element.style.maxHeight = "100%";
+    element.style.maxWidth = "100%";
+  }
 
   function closePopup(popup) {
     fadeOut(popup);

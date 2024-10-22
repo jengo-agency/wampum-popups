@@ -1,18 +1,19 @@
 <?php
+
 /**
- * @package   Wampum_Popups_Setup
+ * @package   Wampum_Popups
  * @author    BizBudding INC + Jengo
  * @license   GPL-2.0+
  *
  * @wordpress-plugin
  * Plugin Name:        Wampum - Popups
  * Description:        A lightweight but flexible WordPress popups plugin
- * Plugin URI:         https://github.com/bizbudding/wampum-popups
+ * Plugin URI:         https://github.com/jengo-agency/wampum-popups
  * Author:             Mike Hemberger, Jengo
  * Text Domain:        wampum-popups
  * License:            GPL-2.0+
  * License URI:        http://www.gnu.org/licenses/gpl-2.0.txt
- * Version:            3.0
+ * Version:            3.1
  * GitHub Plugin URI:  https://github.com/jengo-agency/wampum-popups
  * GitHub Branch:      master
  */
@@ -24,24 +25,20 @@ use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 /**
  * Main functions to create a popup
  *
- * @since  1.0.0
- *
  * @param  string  $content  The content to output in the popup
  * @param  array   $args     Plugin options (type, style, time)
  */
 function wampum_popup($content, $args = []) {
-	echo Wampum_Popups()->get_wampum_popup($content, $args);
+	echo Wampum_Popups()->get_popup($content, $args);
 }
 
 function get_wampum_popup($content, $args = []) {
-	return Wampum_Popups()->get_wampum_popup($content, $args);
+	return Wampum_Popups()->get_popup($content, $args);
 }
 
 /**
  * Main functions to create a direct link to launch a popup
  * Type can only be 'link' or 'button'
- *
- * @since  2.0.0
  *
  * @param  string  $content  The content to output in the popup
  * @param  array   $args     Plugin options (type & text only)
@@ -55,14 +52,14 @@ function get_wampum_popup_link($content, $args = []) {
 	return Wampum_Popups()->wampum_popup_shortcode($args, $content);
 }
 
-if (!class_exists('Wampum_Popups_Setup')) :
+if (!class_exists('Wampum_Popups')) :
 	/**
-	 * Main Wampum_Popups_Setup Class.
+	 * Main Wampum_Popups Class.
 	 */
-	final class Wampum_Popups_Setup {
+	final class Wampum_Popups {
 		/**
 		 * Singleton
-		 * @var   Wampum_Popups_Setup The one true Wampum_Popups_Setup
+		 * @var   Wampum_Popups The one true Wampum_Popups
 		 */
 		private static $instance;
 
@@ -76,17 +73,17 @@ if (!class_exists('Wampum_Popups_Setup')) :
 		private $localize_args = [];
 
 		/**
-		 * Main Wampum_Popups_Setup Instance.
+		 * Wampum_Popups Instance.
 		 *
-		 * Ensures that only one instance of Wampum_Popups_Setup exists in memory at any one time. Also prevents needing to define globals all over the place.
+		 * Ensures that only one instance of Wampum_Popups exists in memory at any one time. Also prevents needing to define globals all over the place.
 		 *
 		 * @static  var array $instance
-		 * @return  object | Wampum_Popups_Setup The one true Wampum_Popups_Setup
+		 * @return  object | Wampum_Popups The one true Wampum_Popups
 		 */
 		public static function instance() {
 			if (!isset(self::$instance)) {
 				// Setup the setup
-				self::$instance = new Wampum_Popups_Setup;
+				self::$instance = new Wampum_Popups;
 				// Methods
 				self::$instance->setup_constants();
 				self::$instance->setup();
@@ -125,7 +122,7 @@ if (!class_exists('Wampum_Popups_Setup')) :
 		private function setup_constants() {
 			// Plugin version.
 			if (!defined('WAMPUM_POPUPS_VERSION')) {
-				define('WAMPUM_POPUPS_VERSION', '3.0');
+				define('WAMPUM_POPUPS_VERSION', '3.1');
 			}
 			// Plugin Folder Path.
 			if (!defined('WAMPUM_POPUPS_PLUGIN_DIR')) {
@@ -212,12 +209,12 @@ if (!class_exists('Wampum_Popups_Setup')) :
 			}
 
 			// Get popup as a variable so it updates popup_counter
-			$popup = $this->get_wampum_popup($popup_content, $atts);
+			$popup = $this->get_popup($popup_content, $atts);
 			if (!$popup) {
 				return '';
 			}
 
-			//Echo popup to footer so it's not inline and weird. If inline, it was also too aggressively adopting .entry-content related styles
+			//Echo popup to footer
 			add_action('wampum_popups', function () use ($popup) {
 				echo $popup;
 			});
@@ -248,7 +245,7 @@ if (!class_exists('Wampum_Popups_Setup')) :
 		 *
 		 * @return string  popup HTML
 		 */
-		function get_wampum_popup($content = null, $args = []) {
+		function get_popup($content = null, $args = []) {
 			if (in_array($args['type'], ['exit', 'timed']) && !trim($content)) {
 				return '';
 			}
@@ -304,16 +301,16 @@ if (!class_exists('Wampum_Popups_Setup')) :
 			$this->localize_args[$this->popup_counter] = $this->get_localize_script_args($args);
 
 			// Send it!
-			return $this->get_wampum_popup_html($content, $args, $this->popup_counter);
+			return $this->get_html($content, $args, $this->popup_counter);
 		}
 
-		function get_wampum_popup_html($content, $args, $index = null) {
+		function get_html($content, $args, $index = null) {
 			// Maybe add close outside class
-			$close_outside = filter_var($args['close_outside'], FILTER_VALIDATE_BOOLEAN) ? ' close-outside' : '';
+			$close_outside = filter_var($args['close_outside'], FILTER_VALIDATE_BOOLEAN) ? 'close-outside' : '';
 			ob_start();
 ?>
 			<div id="wampum-popup-<?= esc_attr($index) ?>" class="wampum-popup" style="display:none;" data-popup="<?= esc_attr($index) ?>">
-				<div class="wampum-popup-overlay<?= esc_attr($close_outside) ?>">
+				<div class="wampum-popup-overlay <?= esc_attr($close_outside) ?>">
 					<div class="wampum-popup-inner" style="max-width:<?= esc_attr($args['width']) ?>;">
 						<?php if (filter_var($args['close_button'], FILTER_VALIDATE_BOOLEAN)) : ?>
 							<div class="wampum-popup-button wampum-popup-close"><span class="screen-reader-text">Close Popup</span></div>
@@ -355,7 +352,7 @@ if (!class_exists('Wampum_Popups_Setup')) :
 			];
 			return [
 				'wampumpopups' => $popup_args,
-				'ouibounce'    => $this->ouibounce_args($ouibounce_args),
+				'ouibounce'    => $this->get_ouibounce_args($ouibounce_args),
 			];
 		}
 
@@ -365,7 +362,7 @@ if (!class_exists('Wampum_Popups_Setup')) :
 		 * @param   array  $ouibounce_args  Array of args to check against
 		 * @return  array  The args to keep
 		 */
-		function ouibounce_args($ouibounce_args) {
+		function get_ouibounce_args($ouibounce_args) {
 			$args = [];
 			$defaults = [
 				'aggressive'   => false,   // true
@@ -398,7 +395,7 @@ if (!class_exists('Wampum_Popups_Setup')) :
 				'type'          => 'gallery',
 				'width'         => 'auto',
 			];
-			wampum_popup('', $args);
+			$this->get_popup('', $args);
 		}
 
 		/**
@@ -424,17 +421,16 @@ endif; // End if class_exists check.
 
 /**
  *
- * The main function responsible for returning the one true Wampum_Popups_Setup Instance to functions everywhere.
+ * The main function responsible for returning the one true Wampum_Popups instance.
+ * Use this function to get a global variable, without needing to declare the global.
  *
- * Use this function like you would a global variable, except without needing to declare the global.
+ * Example: <?php $wampum_popups = Wampum_Popups(); ?>
  *
- * Example: <?php $wampum_popups = Wampum_Popups_Setup_Init(); ?>
- *
- * @return object|Wampum_Popups_Setup The one true Wampum_Popups_Setup Instance.
+ * @return object|Wampum_Popups The one true Wampum_Popups Instance.
  */
 function Wampum_Popups() {
-	return Wampum_Popups_Setup::instance();
+	return Wampum_Popups::instance();
 }
 
-// Get Wampum_Popups_Setup Running.
+// Get Wampum_Popups Running.
 Wampum_Popups();
